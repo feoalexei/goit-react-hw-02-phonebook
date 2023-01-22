@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Box } from '../Box';
 import { StyledContactForm, AddBtn } from './ContactForm.styled';
 
@@ -55,5 +56,9 @@ export class ContactForm extends Component {
     );
   }
 }
+
+ContactForm.propTypes = {
+  addContact: PropTypes.func,
+};
 
 export default ContactForm;
