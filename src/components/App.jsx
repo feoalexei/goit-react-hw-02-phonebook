@@ -3,22 +3,41 @@ import { nanoid } from 'nanoid';
 import ContactForm from './ContactForm';
 import ContactList from './ContactList';
 import Filter from './Filter';
+import { Box } from './Box';
+import { AppContainer } from './App.styled';
 
 export class App extends Component {
   state = {
-    contacts: [],
+    contacts: [
+      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
+      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
+      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
+      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
+    ],
     filter: '',
   };
 
-  addContact = data => {
+  addContact = contactFormInput => {
     const newContact = {
       id: nanoid(),
-      ...data,
+      ...contactFormInput,
     };
 
-    this.setState(prevState => ({
-      contacts: [...prevState.contacts, newContact],
-    }));
+    const { contacts } = this.state;
+
+    const nameAlreadyExists = contacts.find(
+      contact =>
+        contact.name.toLowerCase() === contactFormInput.name.toLowerCase()
+    );
+
+    if (nameAlreadyExists)
+      return alert(`${contactFormInput.name} is already in contacts`);
+
+    this.setState(prevState => {
+      return {
+        contacts: [...prevState.contacts, newContact],
+      };
+    });
   };
 
   deleteContact = contactId => {
@@ -31,17 +50,53 @@ export class App extends Component {
     });
   };
 
-  render() {
-    const { contacts } = this.state;
-    return (
-      <div>
-        <h1>Phonebook</h1>
-        <ContactForm addContact={this.addContact} />
+  applyFilter = e => {
+    this.setState({ filter: e.currentTarget.value });
+  };
 
-        <h2>Contacts</h2>
-        <Filter />
-        <ContactList contacts={contacts} deleteContact={this.deleteContact} />
-      </div>
+  getFilteredContacts = () => {
+    const { contacts, filter } = this.state;
+    return contacts.filter(contact =>
+      contact.name.toLowerCase().includes(filter.toLowerCase())
+    );
+  };
+
+  render() {
+    const { filter } = this.state;
+
+    const filteredContacts = this.getFilteredContacts();
+
+    return (
+      <AppContainer>
+        <Box
+          p={4}
+          mb={4}
+          border="1px solid #087582"
+          borderRadius={4}
+          display="flex"
+          flexDirection="column"
+        >
+          <h1>Phonebook</h1>
+          <ContactForm
+            contacts={this.state.contacts}
+            addContact={this.addContact}
+          />
+        </Box>
+        <Box
+          p={4}
+          border="1px solid #087582"
+          borderRadius={4}
+          display="flex"
+          flexDirection="column"
+        >
+          <h2>Contacts</h2>
+          <Filter value={filter} onChange={this.applyFilter} />
+          <ContactList
+            contacts={filteredContacts}
+            deleteContact={this.deleteContact}
+          />
+        </Box>
+      </AppContainer>
     );
   }
 }
